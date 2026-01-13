@@ -209,7 +209,7 @@ This project is open source and available under the [MIT License](LICENSE).
 ## 👤 Author
 
 **Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
+- GitHub: [@jiyae619](https://github.com/jiyae619)
 
 ## 🙏 Acknowledgments
 
@@ -221,8 +221,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 Have questions or suggestions? Feel free to reach out!
 
-- Email: your.email@example.com
-- Twitter: [@yourhandle](https://twitter.com/yourhandle)
+- Email: jiyaechoi19@gmail.com
 
 ---
 
