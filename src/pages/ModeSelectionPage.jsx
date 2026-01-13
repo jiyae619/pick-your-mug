@@ -1,13 +1,17 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { coffeeModes } from '../data/cafesData';
+import { coffeeModes, cafes } from '../data/cafesData';
 import { getModeDescription, getModeIcon } from '../utils/tagColors';
+import { generateCafeMatches } from '../services/aiMatchingService';
+import { getCachedMatches, setCachedMatches } from '../utils/cacheManager';
 import './ModeSelectionPage.css';
 
 function ModeSelectionPage() {
   const navigate = useNavigate();
   const [selectedModes, setSelectedModes] = useState([]);
+  const [isMatching, setIsMatching] = useState(false);
+  const [error, setError] = useState(null);
 
   const toggleMode = (mode) => {
     if (selectedModes.includes(mode)) {
@@ -17,9 +21,53 @@ function ModeSelectionPage() {
     }
   };
 
-  const handleContinue = () => {
-    if (selectedModes.length === 3) {
-      navigate('/swipe', { state: { selectedModes } });
+  const handleContinue = async () => {
+    if (selectedModes.length !== 3) return;
+
+    setIsMatching(true);
+    setError(null);
+
+    try {
+      // Check cache first
+      let matches = getCachedMatches(selectedModes);
+
+      if (!matches) {
+        // Call AI API to generate match scores
+        matches = await generateCafeMatches(selectedModes, cafes);
+        // Cache the results for 24 hours
+        setCachedMatches(selectedModes, matches);
+      }
+
+      // Rank cafes by AI-generated match score
+      const rankedCafes = cafes
+        .map(cafe => ({
+          ...cafe,
+          matchScore: matches.find(m => m.cafeId === cafe.id)?.score || 0,
+          matchExplanation: matches.find(m => m.cafeId === cafe.id)?.explanation || ''
+        }))
+        .sort((a, b) => b.matchScore - a.matchScore);
+
+      // Navigate to swipe page with ranked cafes
+      navigate('/swipe', {
+        state: {
+          selectedModes,
+          rankedCafes
+        }
+      });
+    } catch (error) {
+      console.error('AI matching failed:', error);
+      setError('Failed to generate matches. Please try again.');
+      // Fallback: navigate with unranked cafes
+      setTimeout(() => {
+        navigate('/swipe', {
+          state: {
+            selectedModes,
+            rankedCafes: cafes
+          }
+        });
+      }, 2000);
+    } finally {
+      setIsMatching(false);
     }
   };
 
@@ -72,16 +120,43 @@ function ModeSelectionPage() {
         <motion.button
           className={`continue-btn ${selectedModes.length === 3 ? 'active' : ''}`}
           onClick={handleContinue}
-          disabled={selectedModes.length !== 3}
+          disabled={selectedModes.length !== 3 || isMatching}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          whileHover={selectedModes.length === 3 ? { scale: 1.05 } : {}}
-          whileTap={selectedModes.length === 3 ? { scale: 0.95 } : {}}
+          whileHover={selectedModes.length === 3 && !isMatching ? { scale: 1.05 } : {}}
+          whileTap={selectedModes.length === 3 && !isMatching ? { scale: 0.95 } : {}}
         >
-          Continue ({selectedModes.length}/3)
+          {isMatching ? 'Finding matches...' : `Continue (${selectedModes.length}/3)`}
         </motion.button>
+
+        {/* Error Message */}
+        {error && (
+          <motion.div
+            className="error-message"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {error}
+          </motion.div>
+        )}
       </div>
+
+      {/* AI Matching Loader Overlay */}
+      {isMatching && (
+        <motion.div
+          className="ai-matching-loader"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <div className="loader-content">
+            <div className="spinner"></div>
+            <h3>Finding your perfect matches...</h3>
+            <p className="loader-subtitle">Analyzing {cafes.length} cafes with AI ✨</p>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

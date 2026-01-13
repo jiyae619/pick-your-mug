@@ -1,0 +1,258 @@
+.swipe-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.swipe-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+}
+
+.back-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.progress {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.favorites-count {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: bold;
+  backdrop-filter: blur(10px);
+}
+
+.card-stack {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 600px;
+}
+
+.card-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+}
+
+.card-preview {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.95);
+  width: 90%;
+  max-width: 400px;
+  height: 600px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(5px);
+}
+
+.preview-text {
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  padding: 20px;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 30px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+}
+
+.action-btn {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.dislike-btn {
+  background: white;
+  color: #FF4458;
+}
+
+.dislike-btn:hover {
+  box-shadow: 0 15px 40px rgba(255, 68, 88, 0.3);
+}
+
+.like-btn {
+  background: white;
+  color: #4CAF50;
+}
+
+.like-btn:hover {
+  box-shadow: 0 15px 40px rgba(76, 175, 80, 0.3);
+}
+
+.btn-icon {
+  font-size: 32px;
+}
+
+.btn-label {
+  font-size: 12px;
+}
+
+.selected-modes {
+  text-align: center;
+  color: white;
+  font-size: 14px;
+  margin-top: 20px;
+  opacity: 0.8;
+}
+
+/* Completion Screen */
+.completion-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.completion-content {
+  background: white;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.completion-icon {
+  font-size: 80px;
+  margin-bottom: 20px;
+}
+
+.completion-content h2 {
+  font-size: 32px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.completion-content p {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.favorites-summary {
+  background: #f8f8f8;
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+}
+
+.favorites-summary h3 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.favorite-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.favorite-item {
+  background: white;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.completion-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.restart-btn,
+.home-btn {
+  flex: 1;
+  padding: 15px;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.restart-btn {
+  background: #8B4513;
+  color: white;
+}
+
+.home-btn {
+  background: #f0f0f0;
+  color: #333;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .swipe-container {
+    padding: 15px;
+  }
+  
+  .card-stack {
+    min-height: 550px;
+  }
+  
+  .action-btn {
+    width: 70px;
+    height: 70px;
+  }
+  
+  .btn-icon {
+    font-size: 28px;
+  }
+  
+  .completion-content {
+    padding: 30px 20px;
+  }
+}

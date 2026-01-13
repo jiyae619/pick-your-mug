@@ -10,20 +10,12 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #1a1a1a;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
-  margin: 0;
-  padding: 0;
-  overflow-x: hidden;
 }
 
 #root {
   min-height: 100vh;
-  max-width: 430px;
-  margin: 0 auto;
-  background: linear-gradient(135deg, #8B4513 0%, #6F4E37 100%);
-  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-  position: relative;
 }
 
 /* Smooth transitions */

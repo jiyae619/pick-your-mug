@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { getTagColor } from '../utils/tagColors';
 import './CafeCard.css';
 
-function CafeCard({ cafe, style, onSwipe, isFirst }) {
+function CafeCard({ cafe, style, onSwipe }) {
   return (
     <motion.div
       className="cafe-card"
@@ -11,7 +11,7 @@ function CafeCard({ cafe, style, onSwipe, isFirst }) {
       dragConstraints={{ left: 0, right: 0 }}
       onDragEnd={(e, { offset, velocity }) => {
         const swipe = Math.abs(offset.x) * velocity.x;
-
+        
         if (swipe > 10000) {
           onSwipe('right');
         } else if (swipe < -10000) {
@@ -22,8 +22,8 @@ function CafeCard({ cafe, style, onSwipe, isFirst }) {
     >
       {/* Cafe Image */}
       <div className="card-image-container">
-        <img
-          src={cafe.image}
+        <img 
+          src={cafe.image} 
           alt={cafe.name}
           className="card-image"
           onError={(e) => {
@@ -40,7 +40,7 @@ function CafeCard({ cafe, style, onSwipe, isFirst }) {
       {/* Cafe Info */}
       <div className="card-content">
         <h2 className="cafe-name">{cafe.name}</h2>
-
+        
         <div className="cafe-location">
           <span className="location-icon">📍</span>
           {cafe.neighborhood}
@@ -69,25 +69,12 @@ function CafeCard({ cafe, style, onSwipe, isFirst }) {
             <span className="tag-more">+{cafe.tags.length - 4}</span>
           )}
         </div>
-
-        {/* Google Maps Link */}
-        <a
-          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cafe.name + ' ' + cafe.neighborhood + ' Seattle')}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="map-link"
-          onClick={(e) => e.stopPropagation()}
-        >
-          📍 View on Google Maps
-        </a>
       </div>
 
-      {/* Swipe Hint - Only show on first card */}
-      {isFirst && (
-        <div className="swipe-hint">
-          ← Swipe to explore →
-        </div>
-      )}
+      {/* Swipe Hint */}
+      <div className="swipe-hint">
+        ← Swipe to explore →
+      </div>
     </motion.div>
   );
 }

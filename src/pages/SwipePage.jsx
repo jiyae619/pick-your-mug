@@ -9,25 +9,34 @@ function SwipePage() {
   const location = useLocation();
   const navigate = useNavigate();
   const selectedModes = location.state?.selectedModes || [];
-  
+  const rankedCafes = location.state?.rankedCafes || cafes;
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [favorites, setFavorites] = useState([]);
   const [direction, setDirection] = useState(null);
+  const [showResults, setShowResults] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
 
-  const currentCafe = cafes[currentIndex];
-  const hasMoreCafes = currentIndex < cafes.length;
+  const MAX_SWIPES = 5;
+  const currentCafe = rankedCafes[currentIndex];
+  const hasMoreCafes = currentIndex < MAX_SWIPES;
 
   const handleSwipe = (swipeDirection) => {
     setDirection(swipeDirection);
-    
+
     if (swipeDirection === 'right') {
       // Add to favorites
       setFavorites([...favorites, currentCafe]);
     }
-    
+
     // Move to next cafe after animation
     setTimeout(() => {
-      setCurrentIndex(prev => prev + 1);
+      const nextIndex = currentIndex + 1;
+      if (nextIndex >= MAX_SWIPES) {
+        setShowResults(true);
+      } else {
+        setCurrentIndex(nextIndex);
+      }
       setDirection(null);
     }, 300);
   };
@@ -36,50 +45,115 @@ function SwipePage() {
     handleSwipe(swipeDirection);
   };
 
-  if (!hasMoreCafes) {
+  const handlePrevCarousel = () => {
+    setCarouselIndex((prev) => (prev > 0 ? prev - 1 : favorites.length - 1));
+  };
+
+  const handleNextCarousel = () => {
+    setCarouselIndex((prev) => (prev < favorites.length - 1 ? prev + 1 : 0));
+  };
+
+  if (showResults) {
     return (
       <div className="swipe-container">
-        <div className="completion-screen">
-          <motion.div
-            className="completion-content"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-          >
-            <div className="completion-icon">🎉</div>
-            <h2>All Done!</h2>
-            <p>You've seen all the cafes</p>
-            
-            {favorites.length > 0 && (
-              <div className="favorites-summary">
-                <h3>You liked {favorites.length} {favorites.length === 1 ? 'cafe' : 'cafes'}:</h3>
-                <div className="favorite-list">
-                  {favorites.map(cafe => (
-                    <div key={cafe.id} className="favorite-item">
-                      ❤️ {cafe.name}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            
-            <div className="completion-buttons">
-              <button
-                className="restart-btn"
-                onClick={() => {
-                  setCurrentIndex(0);
-                  setFavorites([]);
+        <div className="results-screen">
+          {/* Header */}
+          <div className="results-header">
+            <h2 className="results-title">Your Matches 🎉</h2>
+            <p className="results-subtitle">
+              {favorites.length > 0
+                ? `You liked ${favorites.length} ${favorites.length === 1 ? 'cafe' : 'cafes'}!`
+                : 'No cafes selected'}
+            </p>
+          </div>
+
+          {/* Carousel */}
+          {favorites.length > 0 ? (
+            <div className="carousel-container">
+              <motion.div
+                key={carouselIndex}
+                className="carousel-card"
+                initial={{ opacity: 0, x: 100 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -100 }}
+                transition={{ duration: 0.3 }}
+                drag="x"
+                dragConstraints={{ left: 0, right: 0 }}
+                onDragEnd={(e, { offset, velocity }) => {
+                  const swipe = offset.x * velocity.x;
+
+                  if (swipe < -10000) {
+                    handleNextCarousel();
+                  } else if (swipe > 10000) {
+                    handlePrevCarousel();
+                  }
                 }}
               >
-                Start Over
-              </button>
-              <button
-                className="home-btn"
-                onClick={() => navigate('/')}
-              >
-                Home
-              </button>
+                <div className="carousel-card-image">
+                  <img
+                    src={favorites[carouselIndex].image}
+                    alt={favorites[carouselIndex].name}
+                    onError={(e) => {
+                      e.target.src = `https://via.placeholder.com/400x300/8B4513/FFFFFF?text=${favorites[carouselIndex].name}`;
+                    }}
+                  />
+                </div>
+                <div className="carousel-card-content">
+                  <h3 className="carousel-cafe-name">{favorites[carouselIndex].name}</h3>
+                  <div className="carousel-cafe-location">
+                    📍 {favorites[carouselIndex].neighborhood}
+                  </div>
+                  <div className="carousel-cafe-rating">
+                    ⭐ {favorites[carouselIndex].rating} ({favorites[carouselIndex].reviewCount} reviews)
+                  </div>
+                  <p className="carousel-cafe-description">
+                    {favorites[carouselIndex].description}
+                  </p>
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(favorites[carouselIndex].name + ' ' + favorites[carouselIndex].neighborhood + ' Seattle')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="carousel-map-link"
+                  >
+                    📍 View on Google Maps
+                  </a>
+                </div>
+              </motion.div>
+
+              <div className="carousel-indicators">
+                {favorites.map((_, index) => (
+                  <span
+                    key={index}
+                    className={`carousel-dot ${index === carouselIndex ? 'active' : ''}`}
+                    onClick={() => setCarouselIndex(index)}
+                  />
+                ))}
+              </div>
             </div>
-          </motion.div>
+          ) : (
+            <div className="no-matches">
+              <p>😔 No cafes matched your taste</p>
+              <p>Try swiping right on cafes you like!</p>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="results-buttons">
+            <button
+              className="restart-btn"
+              onClick={() => {
+                setCurrentIndex(0);
+                setFavorites([]);
+                setShowResults(false);
+                setCarouselIndex(0);
+              }}
+            >
+              Start Over
+            </button>
+            <button className="home-btn" onClick={() => navigate('/')}>
+              Home
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -93,7 +167,7 @@ function SwipePage() {
           ← Back
         </button>
         <div className="progress">
-          {currentIndex + 1} / {cafes.length}
+          {currentIndex + 1} / {MAX_SWIPES}
         </div>
         <div className="favorites-count">
           ❤️ {favorites.length}
@@ -119,15 +193,16 @@ function SwipePage() {
               <CafeCard
                 cafe={currentCafe}
                 onSwipe={handleSwipe}
+                isFirst={currentIndex === 0}
               />
             </motion.div>
           )}
         </AnimatePresence>
 
         {/* Next card preview */}
-        {currentIndex + 1 < cafes.length && (
+        {currentIndex + 1 < MAX_SWIPES && (
           <div className="card-preview">
-            <div className="preview-text">Next up: {cafes[currentIndex + 1].name}</div>
+            <div className="preview-text">Next up: {rankedCafes[currentIndex + 1].name}</div>
           </div>
         )}
       </div>
